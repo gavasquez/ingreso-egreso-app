@@ -4,6 +4,7 @@ import { map, Subscription } from 'rxjs';
 import { Usuario } from '../models/usuario.models';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Store } from '@ngrx/store';
+import * as ingresoEgresoActions from '../ingreso-egreso/ingreso-egreso.actions';
 import { AppState } from '../app.reducer';
 import * as authActions from '../auth/auth.actions';
 
@@ -13,6 +14,11 @@ import * as authActions from '../auth/auth.actions';
 export class AuthService {
 
   userSubscription!: Subscription;
+  private _user: Usuario | null = null;
+
+  get user() {
+    return this._user;
+  }
 
   constructor(
     private auth: AngularFireAuth,
@@ -24,13 +30,15 @@ export class AuthService {
     this.auth.authState.subscribe(fsUser => {
       if(fsUser){
         this.userSubscription = this.firestore.doc(`${fsUser.uid}/usuario`).valueChanges().subscribe( fireStoreUser => {
-          console.log(fireStoreUser)
           const user = Usuario.fromFirebase(fireStoreUser);
+          this._user = user;
           this.store.dispatch(authActions.setUser( { user: user} ) );
         });
       }else {
         this.userSubscription.unsubscribe();
+        this._user = null;
         this.store.dispatch(authActions.unSetUser());
+        this.store.dispatch(ingresoEgresoActions.unSetItems());
       }
     });
 
