@@ -30,7 +30,7 @@
                 <i class="fa fa-shipping-fast text-danger icon-lg"></i>
               </div>
               <div class="float-right">
-                <p class="mb-0 text-right">Ingresos</p>
+                <p class="mb-0 text-right">Egresos</p>
                 <div class="fluid-container">
                   <h3 class="font-weight-medium text-right mb-0">{{ totalEgresos|currency }}</h3>
                 </div>
@@ -76,11 +76,15 @@
       <div class="card card-statistics">
         <div class="card-body">
           <h1 class="card-title">Gráfica</h1>
-
-            <!-- grafica ira aqui­ -->
-
+          <canvas baseChart
+              [labels]="doughnutChartLabels"
+              [datasets]="doughnutChartDatasets"
+              [legend]="true"
+              [type]="'doughnut'">
+          </canvas>
         </div>
       </div>
   </div>
 
 </div>
+
