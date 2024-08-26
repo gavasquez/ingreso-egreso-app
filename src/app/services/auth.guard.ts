@@ -1,20 +1,20 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
-import { tap } from 'rxjs';
+import { Observable, take, tap } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
-
-  const authService = inject(AuthService);
+const isAuthenticated = (): Observable<boolean | UrlTree> => {
   const router = inject(Router);
-
+  const authService = inject(AuthService);
   return authService.isAuth().pipe(
-    // Tap sirve para disparar un efecto secundario
-    tap( estado => {
-      if(!estado) {
-        console.log("estado => ", estado)
-        router.navigate(['/login'])
+    tap((estado) => {
+      if (!estado) {
+        router.navigate(['/login']);
       }
-    })
+    }),
+    take(1)
   );
 };
+
+export const canActivate: CanActivateFn = isAuthenticated;
+export const canMatch: CanMatchFn = isAuthenticated;
